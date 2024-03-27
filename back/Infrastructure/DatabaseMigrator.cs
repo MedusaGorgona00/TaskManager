@@ -1,7 +1,11 @@
 ﻿using Domain.Entities;
+using Domain.Entities.Users;
+using static Domain.Common.Enums.UserRoleEnum;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System.Data;
 
 namespace Infrastructure
 {
@@ -24,8 +28,13 @@ namespace Infrastructure
 
             try
             {
-                var context = serviceProvider.GetRequiredService<ApplicationDbContext>();
-                await SeedMockDataAsync(context);
+                var roleManager = serviceProvider.GetRequiredService<RoleManager<Role>>();
+                var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
+                await SeedRolesAsync(roleManager);
+                await SeedAdminAsync(userManager);
+
+                //var context = serviceProvider.GetRequiredService<ApplicationDbContext>();
+                // await SeedMockDataAsync(context);
             }
             catch (Exception ex)
             {
@@ -123,5 +132,50 @@ namespace Infrastructure
                 await context.SaveChangesAsync();
             }
         }
+
+
+
+        private static async Task SeedAdminAsync(UserManager<User> userManager)
+        {
+            if (await userManager.Users.AllAsync(us => us.Email != "admin@erda.com"))
+            {
+                var admin = new User
+                {
+                    Email = "admin@backup.com",
+                    UserName = "admin@backup.com",
+                    EmailConfirmed = true,
+                    PhoneNumber = "+10000000000",
+                    PhoneNumberConfirmed = true,
+                    FirstName = "Admin",
+                    LastName = "Admin",
+                    LockoutEnabled = false,
+                };
+
+                await userManager.CreateAsync(admin, "12qw!@QW");
+                await userManager.AddToRoleAsync(admin, nameof(UserRoleEnum.Admin));
+            }
+
+        }
+
+        private static async Task SeedRolesAsync(RoleManager<Role> roleManager)
+        {
+            foreach (UserRoleEnum role in Enum.GetValues(typeof(UserRoleEnum)))
+            {
+                var normalizedRole = role.ToString();
+                var dbRole = roleManager.Roles.FirstOrDefault(r => r.NormalizedName == normalizedRole);
+                if (dbRole == null)
+                {
+                    var result = await roleManager.CreateAsync(new Role { Name = role.ToString() });
+                    dbRole = roleManager.Roles.FirstOrDefault(r => r.NormalizedName == normalizedRole);
+                }
+
+                if (role == UserRoleEnum.Admin && dbRole != null)
+                {
+                    await roleManager.UpdateAsync(dbRole);
+                }
+            }
+        }
+    
     }
+
 }
