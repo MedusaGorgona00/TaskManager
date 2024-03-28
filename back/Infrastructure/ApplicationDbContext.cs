@@ -4,10 +4,14 @@ using EntityFrameworkExtensions;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using EFCore.BulkExtensions;
+using Domain.Entities.Users;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace Infrastructure
 {
-    public class ApplicationDbContext : DbContext, IApplicationDbContext
+    public class ApplicationDbContext : IdentityDbContext<User, Role, string, IdentityUserClaim<string>,
+        UserRole, IdentityUserLogin<string>, IdentityRoleClaim<string>, IdentityUserToken<string>>, IApplicationDbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
@@ -78,6 +82,7 @@ namespace Infrastructure
         public DbSet<Execution> Executions { get; set; } = null!;
         public DbSet<ExecutionHistory> ExecutionHistories { get; set; } = null!;
         public DbSet<Notification> Notifications { get; set; } = null!;
+
         #endregion
     }
 }
