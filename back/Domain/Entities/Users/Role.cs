@@ -1,15 +1,17 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Domain.Common.Enums;
+
 
 namespace Domain.Entities.Users
 {
     public class Role : IdentityRole
     {
-        public UserRoleEnum RoleEnum => Name.ToEnum<UserRoleEnum>();
+        /// <summary>
+        /// Role as Enum
+        /// </summary>
+        //public UserRoleEnum RoleEnum => Name.ToEnum<UserRoleEnum>();
+        //  public UserRoleEnum RoleEnum => Name.ToEnum<UserRoleEnum>();
+        public UserRoleEnum RoleEnum => (UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Name, true);
         public ICollection<UserRole> UserRoles { get; set; }
     }
 }

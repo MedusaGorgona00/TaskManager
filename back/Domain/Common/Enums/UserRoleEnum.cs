@@ -3,7 +3,6 @@
 public enum UserRoleEnum
 {
     Admin = 1,
-    Diller = 2,
-    CompanyOwner = 3,
-    User = 4,
+    Manager = 2,
+    Developer = 3
 }

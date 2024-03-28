@@ -20,6 +20,7 @@ builder.Services.AddAuthorization(options =>
 });
 
 builder.Services.AddInfrastructure(configuration, logging)
+    .AddIdentityServices()
     .AddApplicationDependencies()
     .AddSwaggerDependency(Assembly.GetExecutingAssembly());
 
